@@ -18,17 +18,14 @@ Please follow [HM3DSem](https://aihabitat.org/datasets/hm3d-semantics/) to downl
 
 ```
 data/
-├── objectgoal_hm3d/
-│   ├── train/
-│   ├── val/
-│   └── val_mini/
-├── scene_datasets/
-│   └── hm3d/
-│       ├── minival/
-│       └── val/
-├── versioned_data/
-├── matterport_category_mappings.tsv
-└── object_norm_inv_perplexity.npy
+  scene_datasets/
+  matterport_category_mappings.tsv
+  object_norm_inv_perplexity.npy
+  versioned_data
+  objectgoal_hm3d/
+      train/
+      val/
+      val_mini/
 ```
 
 ### Dependencies

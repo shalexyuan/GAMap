@@ -13,19 +13,6 @@ import numpy as np
 from torch.autograd import Variable
 import torch.nn.functional as F
 
-from transformers import (
-    BertTokenizer,
-    BertForMaskedLM,
-    RobertaTokenizer,
-    RobertaForMaskedLM,
-    GPT2LMHeadModel,
-    GPT2Tokenizer,
-    GPTNeoForCausalLM,
-    AutoTokenizer,
-    AutoModelForCausalLM,
-    GPTJForCausalLM,
-)
-
 from skimage import measure
 import skimage.morphology
 
@@ -123,12 +110,6 @@ def main():
 
     stair_flag = np.zeros((num_scenes))
     clear_flag = np.zeros((num_scenes))
-
-    # INIT DOUBLY RIGHT DETECT
-    # b_device=torch.device(f"cuda:{args.blip_gpu_id}") if torch.cuda.is_available() else "cpu"
-    # doubly_model, doubly_vis_processors, _ = load_model_and_preprocess(
-    #     name="blip2_opt", model_type="pretrain_opt2.7b", is_eval=True,device=b_device
-    # )
 
     # Starting environments
     torch.set_num_threads(1)
@@ -354,140 +335,6 @@ def main():
 
         return Goal_edge, Goal_point, Goal_score
 
-    def configure_lm(lm):
-        """
-        Configure the language model, tokenizer, and embedding generator function.
-
-        Sets self.lm, self.lm_model, self.tokenizer, and self.embedder based on the
-        selected language model inputted to this function.
-
-        Args:
-            lm: str representing name of LM to use
-
-        Returns:
-            None
-        """
-
-        if lm == "BERT":
-            raise NotImplemented
-            tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
-            lm_model = BertForMaskedLM.from_pretrained("bert-base-uncased")
-            object_norm_inv_perplexity = compute_object_norm_inv_ppl(
-                "./label_matrices/bert_base_mean_pll/room_object.npy")
-            start = "[CLS]"
-            end = "[SEP]"
-            mask_id = 103
-        elif lm == "BERT-large":
-            raise NotImplemented
-            tokenizer = BertTokenizer.from_pretrained("bert-large-uncased")
-            lm_model = BertForMaskedLM.from_pretrained("bert-large-uncased")
-            # object_norm_inv_perplexity = compute_object_norm_inv_ppl(
-            #     "./label_matrices/bert_large_mean_pll/room_object.npy")
-            start = "[CLS]"
-            end = "[SEP]"
-            mask_id = 103
-        elif lm == "RoBERTa":
-            raise NotImplemented
-            tokenizer = RobertaTokenizer.from_pretrained("roberta-base")
-            lm_model = RobertaForMaskedLM.from_pretrained("roberta-base")
-            object_norm_inv_perplexity = compute_object_norm_inv_ppl(
-                "./label_matrices/roberta_base_mean_pll/room_object.npy")
-            start = "<s>"
-            end = "</s>"
-            mask_id = tokenizer.convert_tokens_to_ids(
-                tokenizer.tokenize("<mask>"))[0]
-        elif lm == "RoBERTa-large":
-            tokenizer = RobertaTokenizer.from_pretrained("roberta-large")
-            lm_model = RobertaForMaskedLM.from_pretrained("roberta-large")
-            # object_norm_inv_perplexity = compute_object_norm_inv_ppl(
-            #     "./cooccurrency_matrices/" + label_set +
-            #     "_roberta_large/room_object.npy")
-            start = "<s>"
-            end = "</s>"
-            mask_id = tokenizer.convert_tokens_to_ids(
-                tokenizer.tokenize("<mask>"))[0]
-        elif lm == "GPT2-large":
-            # raise NotImplemented
-            lm_model = GPT2LMHeadModel.from_pretrained("gpt2-large")
-            tokenizer = GPT2Tokenizer.from_pretrained("gpt2-large")
-            # object_norm_inv_perplexity = compute_object_norm_inv_ppl(
-            #     "./label_matrices/gpt2_large_negcrossent/room_object.npy")
-        elif lm == "GPT-Neo":
-            raise NotImplemented
-            lm_model = GPTNeoForCausalLM.from_pretrained("EleutherAI/gpt-neo-1.3B")
-            tokenizer = GPT2Tokenizer.from_pretrained("EleutherAI/gpt-neo-1.3B")
-            object_norm_inv_perplexity = compute_object_norm_inv_ppl(
-                "./label_matrices/gptneo_negcrossent/room_object.npy")
-        else:
-            print("Model option " + lm + " not implemented yet")
-            raise NotImplemented
-
-        lm_model.eval()
-        lm_model = lm_model.to(device)
-
-        def scoring_fxn(text):
-            tokens_tensor = tokenizer.encode(text,
-                                             add_special_tokens=False,
-                                             return_tensors="pt").to(device)
-            with torch.no_grad():
-                output = lm_model(tokens_tensor, labels=tokens_tensor)
-                loss = output[0]
-
-                return -loss
-
-        # def scoring_fxn(text, mean=True):
-        #     # Tokenize input
-        #     text = start + " " + text.capitalize() + " " + end
-        #     tokenized_text = tokenizer.tokenize(text)
-        #     indexed_tokens = tokenizer.convert_tokens_to_ids(tokenized_text)
-        #     tokens_tensor = torch.tensor([indexed_tokens]).reshape(-1)
-        #     masked_tokens_tensor = tokens_tensor.repeat(tokens_tensor.shape[0] - 3,
-        #                                                 1)
-
-        #     # Mask out one token per row
-        #     ind1 = np.arange(masked_tokens_tensor.shape[0])
-        #     ind2 = np.arange(1, masked_tokens_tensor.shape[0] + 1)
-        #     masked_tokens_tensor[ind1, ind2] = mask_id
-
-        #     masked_tokens_tensor = masked_tokens_tensor.to(
-        #         device)  # if you have gpu
-
-        #     # Predict all tokens
-        #     with torch.no_grad():
-        #         total = 0
-        #         for i in range(len(masked_tokens_tensor)):
-        #             outputs = lm_model(masked_tokens_tensor[i].unsqueeze(0))
-        #             predictions = outputs[0]  # .to("cpu")
-        #             mask_scores = predictions[0, i + 1]
-        #             total += mask_scores[tokens_tensor[i + 1]] - torch.logsumexp(
-        #                 mask_scores, dim=0)
-
-        #     Z = len(masked_tokens_tensor) if mean else 1
-
-        #     return total / Z
-
-        return scoring_fxn
-
-    scoring_fxn = configure_lm("GPT2-large")
-
-    ### LLM
-    def construct_dist(objs):
-        query_str = "A room containing "
-        for ob in objs:
-            query_str += ob + ", "
-        query_str += "and"
-
-        TEMP = []
-        for label in category_to_id:
-            TEMP_STR = query_str + " "
-            TEMP_STR += label + "."
-
-            score = scoring_fxn(TEMP_STR)
-            TEMP.append(score)
-        dist = torch.tensor(TEMP)
-
-        return dist
-
     # Semantic Mapping
     sem_map_module = Semantic_Mapping(args).to(device)
     sem_map_module.eval()
@@ -578,7 +425,7 @@ def main():
                 wait_env[e] = 1.
                 init_map_and_pose_for_env(e)
                 NEW_EPISODE_C=0
-                print("NEW EPISODE: ", step)
+                # print("NEW EPISODE: ", step)
         # ------------------------------------------------------------------
 
         # ------------------------------------------------------------------
@@ -665,11 +512,8 @@ def main():
                     local_map[e].fill_(0.)
                     clear_flag[e] = 0
 
-            # ------------------------------------------------------------------
 
             ### select the frontier edge
-            # ------------------------------------------------------------------
-            # Edge Update
             for e in range(num_scenes):
 
                 ############################ choose global goal map #############################
@@ -710,10 +554,6 @@ def main():
                 local_ex_map[e] = np.zeros((local_w,
                                             local_h))
 
-                # ------------------------------------------------------------------
-
-                ##### LLM frontier score
-                # ------------------------------------------------------------------
 
                 cn = infos[e]['goal_cat_id'] + 4
                 cname = infos[e]['goal_name']
@@ -733,14 +573,11 @@ def main():
                     if len(objs_list) > 0 and found_goal[e] == 0:
                         frontier_scores = local_map[e][-args.num_attrs:, fmb[0]:fmb[1], fmb[2]:fmb[3]].mean()
                         frontier_score_list[e].append(frontier_scores)
-                        attr_scores=local_map[e][-args.num_attrs:]
+                        # attr_scores=local_map[e][-args.num_attrs:]
 
                     else:
                         frontier_score_list[e].append(Goal_score[lay] / max(Goal_score) * 0.1 + 0.1)
 
-                        # ------------------------------------------------------------------
-
-            # ------------------------------------------------------------------
 
             ##### select randomly point
             # ------------------------------------------------------------------
@@ -782,15 +619,6 @@ def main():
                 else:
                     global_item = 0
                 # ------------------------------------------------------------------
-
-                ###### Get llm frontier reward
-                # ------------------------------------------------------------------
-                if max(frontier_score_list[e]) > 0.1:
-                    if args.task_config == "tasks/objectnav_gibson.yaml":
-                        g_reward = infos[e]['g_reward']
-                        g_process_rewards += g_reward
-                    g_sum_rewards += 1
-                    # print("get llm result!")
 
             if np.any(target_point_map[e] == global_item + 1):
                 local_goal_maps[e][target_point_map[e] == global_item + 1] = 1
