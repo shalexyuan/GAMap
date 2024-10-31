@@ -2,6 +2,5 @@ RedNet/*
 vis/*
 tmp/*
 data/*
-data/
 *.symlink
 **/__pycache__/
