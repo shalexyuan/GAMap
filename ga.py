@@ -24,7 +24,7 @@ from envs import make_vec_envs
 from arguments import get_args
 # import algo
 
-from constants import category_to_id, hm3d_category, category_to_id_gibson,color_palette,cat_att,cat_att_prompt,cat_2_multi_att_prompt
+from constants import category_to_id, hm3d_category, category_to_id_gibson,color_palette,cat_2_multi_att_prompt
 from get_point_score import *
 import envs.utils.pose as pu
 

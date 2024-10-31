@@ -16,7 +16,7 @@ from envs.utils.fmm_planner import FMMPlanner
 from envs.habitat.objectgoal_env import ObjectGoal_Env
 from envs.habitat.objectgoal_env21 import ObjectGoal_Env21
 from agents.utils.semantic_prediction import SemanticPredMaskRCNN
-from constants import color_palette,cat_att,cat_att_prompt,cat_2_multi_att_prompt
+from constants import color_palette,cat_2_multi_att_prompt
 import envs.utils.pose as pu
 import agents.utils.visualization as vu
 
