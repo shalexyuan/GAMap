@@ -422,7 +422,7 @@ if __name__ == "__main__":
     # imgs,score_mape=get_pyramid_clip_score(rgb_obs,vis_processors["eval"],text_processors["eval"],model,attributes,device)
 
     # check dataset
-    data_pth='/home/mmvc/Desktop/L3MVN_Reproduce/L3MVN/data/objectgoal_hm3d/val_mini/content/TEEsavR23oF.json.gz'
+    data_pth='data/objectgoal_hm3d/val_mini/content/TEEsavR23oF.json.gz'
     with gzip.open(data_pth, 'r') as f:
         data = json.loads(f.read().decode('utf-8'))
     for k in data.keys():

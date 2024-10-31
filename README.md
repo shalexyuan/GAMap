@@ -62,9 +62,9 @@ data/
 An example command to run the pipeline:
 
 ```
-CUDA_VISIBLE_DEVICES=0 python main.py --split val --eval 1 --auto_gpu_config 0 --prompt_type scoring \
--n 1 --num_eval_episodes 100 --text_threshold 0.55 --boundary_coeff 12 --start_episode 0 --tag_freq 100 \
---use_gtsem 0 --num_local_steps 20 --print_images 1 --exp_name test
+python ga.py --split val_mini --eval 0 --auto_gpu_config 0 -n 1 \
+--num_eval_episodes 2000 --use_gtsem 0 --num_local_steps 10 \
+--exp_name gamap --agent multi_attr_exp
 ```
 
 [//]: # ()

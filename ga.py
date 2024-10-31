@@ -103,9 +103,7 @@ def main():
     finished = np.zeros((args.num_processes))
     wait_env = np.zeros((args.num_processes))
 
-    g_process_rewards = 0
     g_total_rewards = np.ones((num_scenes))
-    g_sum_rewards = 1
     g_sum_global = 1
 
     stair_flag = np.zeros((num_scenes))
@@ -382,7 +380,6 @@ def main():
             local_map[e, -(args.num_attrs+1), :, :] = 1e-5
             p_input['sem_map_pred'] = local_map[e, 4:-args.num_attrs, :, :
                                       ].argmax(0).cpu().numpy()
-            p_input['attr_map']=local_map[e, -args.num_attrs:, :,:].cpu().numpy()
 
     obs, _, done, infos = envs.rotate_at_beginning_act(planner_inputs)
 
@@ -661,7 +658,6 @@ def main():
                 local_map[e, -(args.num_attrs+1), :, :] = 1e-5
                 p_input['sem_map_pred'] = local_map[e, 4:-args.num_attrs, :,
                                           :].argmax(0).cpu().numpy()
-                p_input['attr_map']=local_map[e, -args.num_attrs:, :,:].cpu().numpy()
 
         if NEW_EPISODE_C<13:
             print(f"INIT ROTATE {step}")
@@ -687,8 +683,8 @@ def main():
                 "FPS {},".format(int(step * num_scenes / (end - start)))
             ])
 
-            log += "\n\tLLM Rewards: " + str(g_process_rewards / g_sum_rewards)
-            log += "\n\tLLM use rate: " + str(g_sum_rewards / g_sum_global)
+            # log += "\n\tLLM Rewards: " + str(g_process_rewards / g_sum_rewards)
+            # log += "\n\tLLM use rate: " + str(g_sum_rewards / g_sum_global)
 
             if args.eval:
                 total_success = []
@@ -737,8 +733,8 @@ def main():
     if args.eval:
         print("Dumping eval details...")
 
-        log += "\n\tLLM Rewards: " + str(g_process_rewards / g_sum_rewards)
-        log += "\n\tLLM use rate: " + str(g_sum_rewards / g_sum_global)
+        # log += "\n\tLLM Rewards: " + str(g_process_rewards / g_sum_rewards)
+        # log += "\n\tLLM use rate: " + str(g_sum_rewards / g_sum_global)
 
         total_success = []
         total_spl = []

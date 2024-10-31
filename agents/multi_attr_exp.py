@@ -642,13 +642,9 @@ class Multi_Attr_Exp_Env_Agent(ObjectGoal_Env21):
                                         args.exp_name)
         ep_dir = '{}/episodes/thread_{}/eps_{}/'.format(
             dump_dir, self.rank, self.episode_no)
-        score_dir = '{}/episodes/thread_{}/score_{}/'.format(
-            dump_dir, self.rank, self.episode_no)
 
         if not os.path.exists(ep_dir):
             os.makedirs(ep_dir)
-        if not os.path.exists(score_dir):
-            os.makedirs(score_dir)
 
 
         local_w = inputs['map_pred'].shape[0]
@@ -740,19 +736,6 @@ class Multi_Attr_Exp_Env_Agent(ObjectGoal_Env21):
                  int(color_palette[10] * 255),
                  int(color_palette[9] * 255))
         cv2.drawContours(self.vis_image, [agent_arrow], 0, color, -1)
-
-        # save attr_map
-        for m,att in zip(inputs['attr_map'],self.goal_attributes):
-            attr_dir = '{}/episodes/thread_{}/score_{}/{}'.format(
-                dump_dir, self.rank, self.episode_no,att)
-            if not os.path.exists(attr_dir):
-                os.makedirs(attr_dir)
-            scores_map=np.flipud(m)
-            # print("min: ",np.min(scores_map),"max: ",np.max(scores_map))
-            scores_map_fn = '{}/episodes/thread_{}/score_{}/{}/{}-{}-Vis-{}.png'.format(
-                dump_dir, self.rank, self.episode_no,att,
-                self.rank, self.episode_no, self.timestep)
-            overlay_attention_map(sem_map_vis,scores_map,scores_map_fn)
 
         if args.visualize:
             # Displaying the image
