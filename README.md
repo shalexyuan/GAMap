@@ -7,7 +7,7 @@
 This is the official repository of [GAMap: Zero-Shot Object Goal Navigation with Multi-Scale Geometric-Affordance Guidance](https://arxiv.org/abs/2402.10670).
 
 <div align=center>
-<img src="./img/t.png" width=80%>
+<img src="./img/t.png" width=100%>
 </div>
 
 ## Setup
