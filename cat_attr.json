@@ -1,0 +1,45 @@
+{
+  "chair": [
+    "chair",
+    "sitting",
+    "chair leg",
+    "chair backrest",
+    "chair seat",
+    "chair armrest"],
+  "bed":[
+    "bed",
+    "sleeping",
+    "lying",
+    "bed mattress",
+    "bed headboard",
+    "bed footboard",
+    "bed bedframe"
+  ],
+  "plant":[
+    "plant",
+    "plant leaf",
+    "plant stem",
+    "plant pot",
+    "plant branch"
+  ],
+  "toilet": [
+    "defecating",
+    "urinating",
+    "flushing",
+    "flush",
+    "lid"
+  ],
+  "tv Monitor": [
+    "displaying",
+    "watching",
+    "tv screen",
+    "tv bezel"
+  ],
+  "sofa": [
+    "sitting",
+    "sofa cushion",
+    "sofa armrest",
+    "sofa backrest",
+    "sofa upholstery",
+    "sofa leg"]
+}
